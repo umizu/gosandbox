@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	"log"
+	"time"
 )
 
 type Server struct {
@@ -11,21 +12,24 @@ type Server struct {
 }
 
 func (s *Server) Run() {
+	fmt.Println()
 	for {
 		select {
-		case <-s.msgch:
-			fmt.Println("msg received")
+		case msg := <-s.msgch:
+			fmt.Println(msg)
 		case <-s.quitch:
 			log.Fatal("quitch received")
 		}
 	}
 }
 
-func main() {
+func RunSelectFile() {
 	s := &Server{
-		msgch: make(chan string),
+		msgch:  make(chan string),
 		quitch: make(chan struct{}),
 	}
 	go s.Run()
+	s.msgch <- "hello"
 	s.quitch <- struct{}{}
+	time.Sleep(1 * time.Second)
 }
